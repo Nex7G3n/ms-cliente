@@ -8,7 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import jakarta.persistence.CascadeType;
 import lombok.Data;
+import lombok.ToString;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -25,4 +30,8 @@ public class Department {
 
     @Column(nullable = false, length = 100, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Province> provinces = new ArrayList<>();
 }

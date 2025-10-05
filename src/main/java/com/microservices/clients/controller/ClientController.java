@@ -1,5 +1,7 @@
 package com.microservices.clients.controller;
 
+import com.microservices.clients.dto.ClientDTO;
+import com.microservices.clients.mapper.ClientMapper;
 import com.microservices.clients.model.Client;
 import com.microservices.clients.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clients")
@@ -15,31 +18,39 @@ public class ClientController {
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private ClientMapper clientMapper;
 
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients() {
+    public ResponseEntity<List<ClientDTO>> getAllClients() {
         List<Client> clients = clientService.findAllClients();
-        return new ResponseEntity<>(clients, HttpStatus.OK);
+        List<ClientDTO> clientDTOs = clients.stream()
+                .map(clientMapper::toDto)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(clientDTOs, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
         return clientService.findClientById(id)
-                .map(client -> new ResponseEntity<>(client, HttpStatus.OK))
+                .map(clientMapper::toDto)
+                .map(clientDTO -> new ResponseEntity<>(clientDTO, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
+    public ResponseEntity<ClientDTO> createClient(@RequestBody ClientDTO clientDTO) {
+        Client client = clientMapper.toEntity(clientDTO);
         Client savedClient = clientService.saveClient(client);
-        return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
+        return new ResponseEntity<>(clientMapper.toDto(savedClient), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client clientDetails) {
+    public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @RequestBody ClientDTO clientDTO) {
         try {
+            Client clientDetails = clientMapper.toEntity(clientDTO);
             Client updatedClient = clientService.updateClient(id, clientDetails);
-            return new ResponseEntity<>(updatedClient, HttpStatus.OK);
+            return new ResponseEntity<>(clientMapper.toDto(updatedClient), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
