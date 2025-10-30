@@ -1,8 +1,8 @@
 package com.microservices.clients.controller;
 
-import com.microservices.clients.dto.ClientDTO;
+import com.microservices.clients.dto.*;
 import com.microservices.clients.mapper.ClientMapper;
-import com.microservices.clients.model.Client;
+import com.microservices.clients.model.*;
 import com.microservices.clients.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/api/clients")
 public class ClientController {
 
     @Autowired

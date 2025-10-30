@@ -5,7 +5,6 @@ import com.microservices.clients.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,21 +26,13 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client saveClient(Client client) {
-        client.setCreatedAt(LocalDateTime.now());
-        client.setUpdatedAt(LocalDateTime.now());
         return clientRepository.save(client);
-    }
-
-    @Override
-    public void deleteClient(Long id) {
-        clientRepository.deleteById(id);
     }
 
     @Override
     public Client updateClient(Long id, Client clientDetails) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client not found for this id :: " + id));
-
+                .orElseThrow(() -> new RuntimeException("Client not found with id " + id));
         client.setFirstName(clientDetails.getFirstName());
         client.setLastName(clientDetails.getLastName());
         client.setEmail(clientDetails.getEmail());
@@ -49,8 +40,11 @@ public class ClientServiceImpl implements ClientService {
         client.setDocumentNumber(clientDetails.getDocumentNumber());
         client.setDocumentType(clientDetails.getDocumentType());
         client.setAddress(clientDetails.getAddress());
-        client.setUpdatedAt(LocalDateTime.now());
-
         return clientRepository.save(client);
+    }
+
+    @Override
+    public void deleteClient(Long id) {
+        clientRepository.deleteById(id);
     }
 }
